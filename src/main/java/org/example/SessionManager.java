@@ -36,7 +36,7 @@ public class SessionManager {
     }
 
     /**
-     * Removes the session (the Log out logic)
+     * Removes the session (Log out logic)
      * @param token The token to invalidate
      */
     public static void logout(String token) {

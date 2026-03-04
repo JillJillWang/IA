@@ -39,7 +39,7 @@ public class Student {
         this.lastMeetingTimestamp = System.currentTimeMillis(); // Initialize with current time
     }
 
-    // Logic to check whether the password is correct or not
+    // Logic to check if the password is correct
     public boolean hasPassword(String password) {
         return this.password.equals(password);
     }
