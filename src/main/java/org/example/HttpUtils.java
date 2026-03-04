@@ -33,7 +33,7 @@ public class HttpUtils {
 
     /**
      * Helper method to extract the Session Token from the HTTP 'Cookie' header
-     * Example header: Cookie: session=1234-abcd-...
+     * An example header: Cookie: session=1234-abcd-...
      * @param exchange HttpExchange object
      * @return The token string, or null if not found
      */
