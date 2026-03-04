@@ -40,6 +40,7 @@ public class LoginHandler implements HttpHandler {
             BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8));
             String query = br.readLine();
 
+
             String email = "";
             String password = "";
 
@@ -62,12 +63,12 @@ public class LoginHandler implements HttpHandler {
             // Query the student from the database
             Student student = studentDao.queryForId(email);
 
-            // Check if student exists and the password matches (Success Criteria 1 & 2)
+            // Check if student exists and the password matches
             if (student != null && student.hasPassword(password)) {
                 // Create a session and get the token
                 String token = SessionManager.createSession(student);
 
-                // IMPORTANT: Set the "Set-Cookie" header to store the session on the user's browser
+                // Set the "Set-Cookie" header to store the session on the user's browser
                 // Path=/ means the cookie is valid for the whole website
                 exchange.getResponseHeaders().add("Set-Cookie", "session=" + token + "; Path=/; HttpOnly");
 

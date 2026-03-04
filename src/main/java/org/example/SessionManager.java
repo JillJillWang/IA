@@ -10,7 +10,7 @@ import java.util.UUID;
  * It maps a unique Token (stored in browser cookie) to a Student object.
  */
 public class SessionManager {
-    // A thread-safe-like approach (simplified for IA) to store active sessions
+    // A thread-safe-like approach to store active sessions
     // Key: Session ID (UUID), Value: The logged-in Student object
     private static final Map<String, Student> sessions = new HashMap<>();
 

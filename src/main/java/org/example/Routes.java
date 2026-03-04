@@ -5,36 +5,30 @@ package org.example;
  * It standardizes the routing rules of the entire project
  */
 public class Routes {
-    /*
-    Project root path
-    When accessing http://localhost:8080/, the corresponding home page is displayed
-     */
+
+    // Project root path
+    // When accessing http://localhost:8080/, the corresponding home page is displayed
     public static final String ROOT = "/";
 
-    /*
-    Path of the student registration form page
-    The front end accesses this path to display the registration form
-    Corresponding to create-student.html
-     */
+    // Path of the student registration form page
+    // The front end accesses this path to display the registration form
+    // Corresponding to create-student.html
     public static final String CREATE_STUDENT = "/create-student";
 
-    /*
-    Path of student registration submission
-    When submitting form data, request this path
-    Corresponding to SaveStudentHandler
-     */
+    //Path of student registration submission
+    //When submitting form data, request this path
+    //Corresponding to SaveStudentHandler
     public static final String SAVE_STUDENT = "/save-student";
 
-    /*
-   Path of the login page
-   When the front end accesses this path, the login form is displayed
-    */
+   // Path of the login page
+   // When the front end accesses this path, the login form is displayed
     public static final String LOGIN = "/login";
 
-    /*
-   Path of the error page
-   When an error occurs during operation, jump to this page
-    */
+    // Path to process the login form submission
+    public static final String DO_LOGIN = "/do-login";
+
+   // Path of the error page
+   // When an error occurs during operation, jump to this page
     public static final String ERROR = "/error";
 
 

@@ -9,6 +9,7 @@ import org.example.Student;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import static org.example.HttpUtils.showError;
 
@@ -72,50 +73,49 @@ public class SaveStudentHandler implements HttpHandler{
 
 
     /**
-     * This method is used to parses data from HTTP into a Student object
+     * This method parses data from HTTP into a Student object and decodes URL entities.
+     * I used URLDecoder to ensure special characters like '@' are stored correctly.
      * @param exchange HttpExchange object, the carrier of HTTP requests and responses
      * @return Return validated Student object
      * @throws IOException The exception to inputs and outputs
      */
     private static Student getStudent(HttpExchange exchange) throws IOException {
-        // Read the data from the database using BufferedReader
-        BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody()));
-        // Create a new object to store parsed form data
+        // Read the data from the request body
+        BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8));
         Student newStudent = new Student();
-        // Read data as a single string (format: email=user@example.com&name=John&classNum=1&password=123)
         String query = br.readLine();
+
+        if (query == null || query.isEmpty()) {
+            throw new IOException("Request body is empty");
+        }
 
         // Split the query string by "&"
         String[] vars = query.split("&");
-        // Iterate over each keyvalue pair to extract and map data to Student object
         for (String var : vars) {
-            // Split each pair by "=" to separate key (field name) and value (user input)
             String[] keyvalue = var.split("=");
+            if (keyvalue.length < 2) continue;
 
-            // Map parsed value to corresponding Student field,
-            // assign the value input by the user to the Student object
-            // Validate that the field is one of the expected registration fields
-            if (keyvalue[0].equalsIgnoreCase("email")) {
-                newStudent.setEmail(keyvalue[1]);
-            } else if (keyvalue[0].equalsIgnoreCase("name")) {
-                newStudent.setName(keyvalue[1]);
-            } else if (keyvalue[0].equalsIgnoreCase("password")) {
-                newStudent.setPassword(keyvalue[1]);
-            } else if (keyvalue[0].equalsIgnoreCase("classnum")) {
-                newStudent.setClassNum(Integer.parseInt(keyvalue[1]));
-            } else {
-                throw new IOException("Input is not valid: " + keyvalue[0]);
+            // Decode the value to handle special characters like @ in emails
+            String key = keyvalue[0];
+            String value = java.net.URLDecoder.decode(keyvalue[1], StandardCharsets.UTF_8);
+
+            if (key.equalsIgnoreCase("email")) {
+                newStudent.setEmail(value);
+            } else if (key.equalsIgnoreCase("name")) {
+                newStudent.setName(value);
+            } else if (key.equalsIgnoreCase("password")) {
+                newStudent.setPassword(value);
+            } else if (key.equalsIgnoreCase("classnum")) {
+                newStudent.setClassNum(Integer.parseInt(value));
             }
         }
 
-
-        // Make sure that all required fields are not empty
+        // Basic validation to ensure all fields are present
         if (newStudent.getEmail() == null || newStudent.getName() == null
                 || newStudent.getPassword() == null) {
             throw new IOException("All fields (email, name, password, classNum) are required");
         }
         return newStudent;
-
     }
 
 
