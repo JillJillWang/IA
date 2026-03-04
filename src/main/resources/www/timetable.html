@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My Timetable</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .table-success { background-color: #d1e7dd !important; }
+    </style>
+</head>
+<body class="container mt-5">
+<h2>Welcome, {{STUDENT_NAME}}</h2>
+<p>Click on the time slots to mark your availability (Green = Available).</p>
+
+<table class="table table-bordered text-center">
+    <thead>
+    <tr>
+        <th>Period</th>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{TABLE_BODY}}
+    </tbody>
+</table>
+
+<script>
+    // We will implement the toggleCell function in the next step to save data to the database
+    function toggleCell(index) {
+        console.log("Clicked cell index: " + index);
+        // TODO: Send AJAX request to update database
+    }
+</script>
+</body>
+</html>

@@ -73,7 +73,7 @@ public class LoginHandler implements HttpHandler {
                 exchange.getResponseHeaders().add("Set-Cookie", "session=" + token + "; Path=/; HttpOnly");
 
                 // Redirect the student to the main page after successful login
-                exchange.getResponseHeaders().add("Location", Routes.ROOT);
+                exchange.getResponseHeaders().add("Location", Routes.TIMETABLE);
                 exchange.sendResponseHeaders(302, -1);
             } else {
                 // If login fails, show an error on the error page

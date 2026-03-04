@@ -27,6 +27,9 @@ public class Routes {
     // Path to process the login form submission
     public static final String DO_LOGIN = "/do-login";
 
+    // Path for the student's personal timetable page
+    public static final String TIMETABLE = "/timetable";
+
    // Path of the error page
    // When an error occurs during operation, jump to this page
     public static final String ERROR = "/error";

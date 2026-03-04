@@ -7,9 +7,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
-import org.example.handlers.LoginHandler;
-import org.example.handlers.SaveStudentHandler;
-import org.example.handlers.StaticFileHandler;
+import org.example.handlers.*;
 import org.h2.tools.Server;
 
 import java.net.InetSocketAddress;
@@ -61,6 +59,8 @@ public class MainServer {
                 server.createContext(Routes.LOGIN, new StaticFileHandler(FilePaths.LOGIN));
                 // Login process (handles the form submission)
                 server.createContext(Routes.DO_LOGIN, new LoginHandler(studentDao));
+                // Timetalbe page
+                server.createContext(Routes.TIMETABLE, new TimetableHandler());
                 // Error page: Return to the error page when handling an exception
                 server.createContext(Routes.ERROR, new StaticFileHandler(FilePaths.ERROR));
 

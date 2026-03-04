@@ -20,6 +20,9 @@ public class FilePaths {
     // Path to the log in HTML file
     public static final String LOGIN = WWW_ROOT + "login.html";
 
+    // Path to the timetable HTML template
+    public static final String TIMETABLE = WWW_ROOT + "timetable.html";
+
     // Path to the error page HTML file
     // Used to display error information
     public static final String ERROR = WWW_ROOT + "error.html";
