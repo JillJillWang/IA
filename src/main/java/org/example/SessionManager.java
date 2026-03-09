@@ -12,25 +12,26 @@ import java.util.UUID;
 public class SessionManager {
     // A thread-safe-like approach to store active sessions
     // Key: Session ID (UUID), Value: The logged-in Student object
-    private static final Map<String, Student> sessions = new HashMap<>();
+    // I use Polymorphism here: A Map that accepts any object extending the User class
+    private static final Map<String, User> sessions = new HashMap<>();
 
     /**
      * Creates a new session for a user and returns the Token
-     * @param student The student who just logged in
+     * @param user The user who just logged in
      * @return A unique session token string
      */
-    public static String createSession(Student student) {
+    public static String createSession(User user) {
         String token = UUID.randomUUID().toString();
-        sessions.put(token, student);
+        sessions.put(token, user);
         return token;
     }
 
     /**
-     * Retrieves the student associated with a specific token
+     * Retrieves the user associated with a specific token
      * @param token The token from the HTTP Cookie header
-     * @return Student object if found, otherwise null
+     * @return User object if found, otherwise null
      */
-    public static Student getStudent(String token) {
+    public static User getUser(String token) {
         if (token == null) return null;
         return sessions.get(token);
     }

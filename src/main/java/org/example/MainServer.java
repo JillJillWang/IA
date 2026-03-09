@@ -45,6 +45,16 @@ public class MainServer {
                 // Create the table if it doesn't exist
                 TableUtils.createTableIfNotExists(connectionSource, Student.class);
 
+                // Create Teacher table
+                TableUtils.createTableIfNotExists(connectionSource, Teacher.class);
+                Dao<Teacher, String> teacherDao = DaoManager.createDao(connectionSource, Teacher.class);
+
+                // Initialize a default teacher if it doesn't exist (Hardcoded for Client)
+                if (teacherDao.queryForId("teacher@school.com") == null) {
+                    Teacher defaultTeacher = new Teacher("teacher@school.com", "Mrs. He", "password123");
+                    teacherDao.create(defaultTeacher);
+                }
+
                 // Initialize the HTTP server
                 // http://localhost:8080
                 HttpServer server = HttpServer.create(new InetSocketAddress(8080),0);
@@ -58,11 +68,11 @@ public class MainServer {
                 // Log in
                 server.createContext(Routes.LOGIN, new StaticFileHandler(FilePaths.LOGIN));
                 // Login process (handles the form submission)
-                server.createContext(Routes.DO_LOGIN, new LoginHandler(studentDao));
+                server.createContext(Routes.DO_LOGIN, new LoginHandler(studentDao, teacherDao));
                 // Timetable page
                 server.createContext(Routes.TIMETABLE, new TimetableHandler());
                 // Save timetable process
-                server.createContext(Routes.SAVE_TIMETABLE, new SaveTimetableHandler(studentDao));
+                server.createContext(Routes.SAVE_TIMETABLE, new SaveTimetableHandler(studentDao, teacherDao));
                 // Error page: Return to the error page when handling an exception
                 server.createContext(Routes.ERROR, new StaticFileHandler(FilePaths.ERROR));
 
