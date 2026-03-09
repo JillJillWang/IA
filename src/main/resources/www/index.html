@@ -1,20 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>00's Meeting Arranger Home Page</title>
-</head>
 <body class="container mt-5 text-center">
 <h1 class="mb-4">00's Meeting Arranger</h1>
-<p class="lead">Efficiently coordinate meetings with your teachers.</p>
+<p class="lead text-muted">Please select your role to continue.</p>
 
-<div class="mt-5">
-    <a href="/timetable" class="btn btn-primary btn-lg px-4 gap-3">View My Timetable</a>
-</div>
+<div class="row mt-5">
+    <div class="col-md-6 border-end">
+        <h3>Students</h3>
+        <div class="d-grid gap-2 col-8 mx-auto mt-3">
+            <a href="/login" class="btn btn-primary">Student Login</a>
+            <a href="/create-student" class="btn btn-outline-primary">Student Register</a>
+        </div>
+    </div>
 
-<div class="mt-3">
-    <a href="/login" class="btn btn-outline-secondary">Login</a>
-    <a href="/create-student" class="btn btn-outline-secondary">Register</a>
+    <div class="col-md-6">
+        <h3>Teachers</h3>
+        <div class="d-grid gap-2 col-8 mx-auto mt-3">
+            <a href="/login" class="btn btn-success">Teacher Login</a>
+            <a href="/create-teacher" class="btn btn-outline-success">Teacher Register</a>
+        </div>
+    </div>
 </div>
 </body>
-</html>

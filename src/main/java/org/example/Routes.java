@@ -20,6 +20,12 @@ public class Routes {
     //Corresponding to SaveStudentHandler
     public static final String SAVE_STUDENT = "/save-student";
 
+    // Path of the teacher registration form page
+    public static final String CREATE_TEACHER = "/create-teacher";
+
+    //Path of teacher registration submission
+    public static final String SAVE_TEACHER = "/save-teacher";
+
    // Path of the login page
    // When the front end accesses this path, the login form is displayed
     public static final String LOGIN = "/login";

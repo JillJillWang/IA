@@ -49,11 +49,6 @@ public class MainServer {
                 TableUtils.createTableIfNotExists(connectionSource, Teacher.class);
                 Dao<Teacher, String> teacherDao = DaoManager.createDao(connectionSource, Teacher.class);
 
-                // Initialize a default teacher if it doesn't exist (Hardcoded for Client)
-                if (teacherDao.queryForId("teacher@school.com") == null) {
-                    Teacher defaultTeacher = new Teacher("teacher@school.com", "Mrs. He", "password123");
-                    teacherDao.create(defaultTeacher);
-                }
 
                 // Initialize the HTTP server
                 // http://localhost:8080
@@ -65,6 +60,10 @@ public class MainServer {
                 server.createContext(Routes.CREATE_STUDENT, new StaticFileHandler(FilePaths.CREATE_STUDENT));
                 // Save student's account
                 server.createContext(Routes.SAVE_STUDENT, new SaveStudentHandler(studentDao));
+                // Create teacher's account page
+                server.createContext(Routes.CREATE_TEACHER, new StaticFileHandler(FilePaths.CREATE_TEACHER));
+                // Save teacher's account
+                server.createContext(Routes.SAVE_TEACHER, new SaveTeacherHandler(teacherDao));
                 // Log in
                 server.createContext(Routes.LOGIN, new StaticFileHandler(FilePaths.LOGIN));
                 // Login process (handles the form submission)

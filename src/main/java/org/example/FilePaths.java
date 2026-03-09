@@ -17,6 +17,9 @@ public class FilePaths {
     // Path to the student registration HTML file
     public static final String CREATE_STUDENT = WWW_ROOT + "create-student.html";
 
+    // Path to the teacher registration HTML file
+    public static final String CREATE_TEACHER = WWW_ROOT + "create-teacher.html";
+
     // Path to the log in HTML file
     public static final String LOGIN = WWW_ROOT + "login.html";
 
