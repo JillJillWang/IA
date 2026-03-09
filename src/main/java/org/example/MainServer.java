@@ -59,8 +59,10 @@ public class MainServer {
                 server.createContext(Routes.LOGIN, new StaticFileHandler(FilePaths.LOGIN));
                 // Login process (handles the form submission)
                 server.createContext(Routes.DO_LOGIN, new LoginHandler(studentDao));
-                // Timetalbe page
+                // Timetable page
                 server.createContext(Routes.TIMETABLE, new TimetableHandler());
+                // Save timetable process
+                server.createContext(Routes.SAVE_TIMETABLE, new SaveTimetableHandler(studentDao));
                 // Error page: Return to the error page when handling an exception
                 server.createContext(Routes.ERROR, new StaticFileHandler(FilePaths.ERROR));
 

@@ -30,6 +30,9 @@ public class Routes {
     // Path for the student's personal timetable page
     public static final String TIMETABLE = "/timetable";
 
+    // Path to process the manual saving of the timetable
+    public static final String SAVE_TIMETABLE = "/save-timetable";
+
    // Path of the error page
    // When an error occurs during operation, jump to this page
     public static final String ERROR = "/error";

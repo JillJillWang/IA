@@ -14,6 +14,10 @@ import java.nio.charset.StandardCharsets;
  */
 public class TimetableHandler implements HttpHandler {
 
+    // One week has five workdays, each workday has nine periods
+    public static final int DAYS_IN_WEEK = 5;
+    public static final int PERIODS_PER_DAY = 9;
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         // Security Check: Get the session token from cookie
@@ -43,12 +47,12 @@ public class TimetableHandler implements HttpHandler {
 
         String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
 
-        for (int p = 0; p < 9; p++) { // 9 Periods (Rows)
+        for (int p = 0; p < PERIODS_PER_DAY; p++) { // 9 Periods (Rows)
             tableHtml.append("<tr>");
             tableHtml.append("<td>Period ").append(p + 1).append("</td>");
 
-            for (int d = 0; d < 5; d++) { // 5 Days (Columns)
-                int index = d * 9 + p; // Calculate the 1D index from 2D coordinates
+            for (int d = 0; d < DAYS_IN_WEEK; d++) { // 5 Days (Columns)
+                int index = d * PERIODS_PER_DAY + p; // Calculate the 1D index from 2D coordinates
                 char status = availability.charAt(index);
 
                 // If status is '1', the cell is green (available), else it's white
@@ -67,6 +71,7 @@ public class TimetableHandler implements HttpHandler {
         // Replace placeholders in the HTML
         html = html.replace("{{STUDENT_NAME}}", currentStudent.getName());
         html = html.replace("{{TABLE_BODY}}", tableHtml.toString());
+        html = html.replace("{{AVAILABILITY_STRING}}", availability);
 
         // Send Response
         byte[] response = html.getBytes(StandardCharsets.UTF_8);
