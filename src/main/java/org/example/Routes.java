@@ -40,8 +40,11 @@ public class Routes {
     // Path to process the manual saving of the timetable
     public static final String SAVE_TIMETABLE = "/save-timetable";
 
-    // Paths for the teacher's dashboard
+    // Path for the teacher's dashboard
     public static final String TEACHER_DASHBOARD = "/teacher-dashboard";
+
+    // Path to view matching students (for the teacher)
+    public static final String VIEW_MATCHES = "/view-matches";
 
 
    // Path of the error page

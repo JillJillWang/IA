@@ -76,6 +76,8 @@ public class MainServer {
                 server.createContext(Routes.SAVE_TIMETABLE, new SaveTimetableHandler(studentDao, teacherDao));
                 // Show the teacher's dashboard
                 server.createContext(Routes.TEACHER_DASHBOARD, new TeacherDashboardHandler());
+                // Show the matching results (for the teacher)
+                server.createContext(Routes.VIEW_MATCHES, new ViewMatchesHandler(studentDao));
 
 
 
