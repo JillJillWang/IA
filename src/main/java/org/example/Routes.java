@@ -28,7 +28,8 @@ public class Routes {
 
    // Path of the login page
    // When the front end accesses this path, the login form is displayed
-    public static final String LOGIN = "/login";
+    public static final String STUDENT_LOGIN = "/student-login";
+    public static final String TEACHER_LOGIN = "/teacher-login";
 
     // Path to process the login form submission
     public static final String DO_LOGIN = "/do-login";

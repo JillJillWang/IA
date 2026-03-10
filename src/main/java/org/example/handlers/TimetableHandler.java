@@ -23,7 +23,7 @@ public class TimetableHandler implements HttpHandler {
 
         // If not logged in, redirect to login page
         if (currentUser == null) {
-            exchange.getResponseHeaders().add("Location", Routes.LOGIN);
+            exchange.getResponseHeaders().add("Location", Routes.ROOT);
             exchange.sendResponseHeaders(302, -1);
             return;
         }

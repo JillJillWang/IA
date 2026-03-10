@@ -32,7 +32,7 @@ public class SaveTimetableHandler implements HttpHandler {
 
         // Redirect to login if session is invalid
         if (currentUser == null) {
-            exchange.getResponseHeaders().add("Location", Routes.LOGIN);
+            exchange.getResponseHeaders().add("Location", Routes.ROOT);
             exchange.sendResponseHeaders(302, -1);
             return;
         }

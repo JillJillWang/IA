@@ -52,9 +52,9 @@ public class SaveTeacherHandler implements HttpHandler {
                 return;
             }
 
-            // Save and redirect to Login
+            // Save and redirect to the teacher login page
             teacherDao.create(newTeacher);
-            exchange.getResponseHeaders().add("Location", Routes.LOGIN);
+            exchange.getResponseHeaders().add("Location", Routes.TEACHER_LOGIN);
             exchange.sendResponseHeaders(302, -1);
 
         } catch (Exception e) {

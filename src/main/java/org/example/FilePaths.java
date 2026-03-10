@@ -21,7 +21,8 @@ public class FilePaths {
     public static final String CREATE_TEACHER = WWW_ROOT + "create-teacher.html";
 
     // Path to the log in HTML file
-    public static final String LOGIN = WWW_ROOT + "login.html";
+    public static final String STUDENT_LOGIN = WWW_ROOT + "student-login.html";
+    public static final String TEACHER_LOGIN = WWW_ROOT + "teacher-login.html";
 
     // Path to the timetable HTML template
     public static final String TIMETABLE = WWW_ROOT + "timetable.html";

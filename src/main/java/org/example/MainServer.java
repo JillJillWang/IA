@@ -26,7 +26,7 @@ public class MainServer {
      */
     public static void main(String[] args) {
         // Connect the database with URL（H2 database）
-        String databaseUrl = "jdbc:h2:file:./database/student.db"; //how to write the url?
+        String databaseUrl = "jdbc:h2:file:./database/user.db";
         // ORMLite ConnectionSource: Manages the database connection lifecycle
         ConnectionSource connectionSource;
 
@@ -64,8 +64,10 @@ public class MainServer {
                 server.createContext(Routes.CREATE_TEACHER, new StaticFileHandler(FilePaths.CREATE_TEACHER));
                 // Save teacher's account
                 server.createContext(Routes.SAVE_TEACHER, new SaveTeacherHandler(teacherDao));
-                // Log in
-                server.createContext(Routes.LOGIN, new StaticFileHandler(FilePaths.LOGIN));
+                // Serve the Student Login page
+                server.createContext(Routes.STUDENT_LOGIN, new StaticFileHandler(FilePaths.STUDENT_LOGIN));
+                // Serve the Teacher Login page
+                server.createContext(Routes.TEACHER_LOGIN, new StaticFileHandler(FilePaths.TEACHER_LOGIN));
                 // Login process (handles the form submission)
                 server.createContext(Routes.DO_LOGIN, new LoginHandler(studentDao, teacherDao));
                 // Timetable page

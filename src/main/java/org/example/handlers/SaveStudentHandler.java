@@ -57,8 +57,8 @@ public class SaveStudentHandler implements HttpHandler{
 
             // Save the Student object to the database using ORMLite DAO
             this.studentDao.create(student);
-            // Create the initialization setting - home page - for redirect
-            exchange.getResponseHeaders().add("Location", Routes.ROOT);
+            // Redirect to Student Login page after successful registration
+            exchange.getResponseHeaders().add("Location", Routes.STUDENT_LOGIN);
             exchange.sendResponseHeaders(302, -1); // 302: redirect code, -1: no response body
 
 
