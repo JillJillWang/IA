@@ -26,6 +26,9 @@ public class FilePaths {
     // Path to the timetable HTML template
     public static final String TIMETABLE = WWW_ROOT + "timetable.html";
 
+    // Paths to the teacher's dashboard
+    public static final String TEACHER_DASHBOARD = WWW_ROOT + "teacher-dashboard.html";
+
     // Path to the error page HTML file
     // Used to display error information
     public static final String ERROR = WWW_ROOT + "error.html";

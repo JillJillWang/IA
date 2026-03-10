@@ -3,10 +3,7 @@ package org.example.handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -21,7 +18,7 @@ public class TimetableHandler implements HttpHandler {
         // Security Check: Get the session token from cookie
         String token = HttpUtils.getSessionToken(exchange);
 
-        // POLYMORPHISM IN ACTION: Fetch as generic User, not specific Student
+        // Fetch as generic User, not specific Student/Teacher (Polymorphism)
         User currentUser = SessionManager.getUser(token);
 
         // If not logged in, redirect to login page
@@ -33,6 +30,7 @@ public class TimetableHandler implements HttpHandler {
 
         // Load the HTML template
         InputStream in = getClass().getResourceAsStream(FilePaths.TIMETABLE);
+        // Check if template file exists
         if (in == null) {
             HttpUtils.showError(exchange, "Timetable template not found.");
             return;
@@ -40,42 +38,42 @@ public class TimetableHandler implements HttpHandler {
         String html = new String(in.readAllBytes(), StandardCharsets.UTF_8);
         in.close();
 
-        // Generate the Dynamic Table Body
+        // Identify user role for display
+        String role = (currentUser instanceof Teacher) ? "Teacher" : "Student";
+
+        // Generate table body with 5 days * 9 periods
+        StringBuilder tableBody = new StringBuilder();
         // The getAvailability() method is defined in the User base class,
         // so it works seamlessly for both teachers and students.
         String availability = currentUser.getAvailability();
-        StringBuilder tableHtml = new StringBuilder();
 
-        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+        // Define constants for week days and daily periods
         final int DAYS_IN_WEEK = 5;
         final int PERIODS_PER_DAY = 9;
 
-        for (int p = 0; p < PERIODS_PER_DAY; p++) {
-            tableHtml.append("<tr>");
-            tableHtml.append("<td>Period ").append(p + 1).append("</td>");
-
-            for (int d = 0; d < DAYS_IN_WEEK; d++) {
+        for (int p = 0; p < PERIODS_PER_DAY; p++) { // 9 periods per day
+            tableBody.append("<tr>");
+            tableBody.append("<td>Period ").append(p + 1).append("</td>");
+            for (int d = 0; d < DAYS_IN_WEEK; d++) { // 5 days per week
                 int index = d * PERIODS_PER_DAY + p;
                 char status = availability.charAt(index);
+                String bgColor = (status == '1') ? "style='background-color:lightgreen;'" : "";
 
-                String colorClass = (status == '1') ? "table-success" : "";
-                String text = (status == '1') ? "Available" : "Busy";
-
-                tableHtml.append(String.format(
-                        "<td class='%s' onclick='toggleCell(%d)' style='cursor:pointer' id='cell-%d'>%s</td>",
-                        colorClass, index, index, text
+                tableBody.append(String.format(
+                        "<td id='cell-%d' onclick='toggleCell(%d)' %s>%s</td>",
+                        index, index, bgColor, (status == '1' ? "Available" : "Busy")
                 ));
             }
-            tableHtml.append("</tr>");
+            tableBody.append("</tr>");
         }
 
-        // Replace placeholders in the HTML
+        // Basic template replacement
         // getName() is also inherited from the User base class
-        html = html.replace("{{STUDENT_NAME}}", currentUser.getName());
-        html = html.replace("{{TABLE_BODY}}", tableHtml.toString());
+        html = html.replace("{{USER_NAME}}", currentUser.getName());
+        html = html.replace("{{USER_ROLE}}", role);
         html = html.replace("{{AVAILABILITY_STRING}}", availability);
+        html = html.replace("{{TABLE_BODY}}", tableBody.toString());
 
-        // Send Response
         byte[] response = html.getBytes(StandardCharsets.UTF_8);
         exchange.sendResponseHeaders(200, response.length);
         OutputStream os = exchange.getResponseBody();

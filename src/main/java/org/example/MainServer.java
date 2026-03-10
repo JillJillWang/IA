@@ -72,6 +72,12 @@ public class MainServer {
                 server.createContext(Routes.TIMETABLE, new TimetableHandler());
                 // Save timetable process
                 server.createContext(Routes.SAVE_TIMETABLE, new SaveTimetableHandler(studentDao, teacherDao));
+                // Show the teacher's dashboard
+                server.createContext(Routes.TEACHER_DASHBOARD, new TeacherDashboardHandler());
+
+
+
+
                 // Error page: Return to the error page when handling an exception
                 server.createContext(Routes.ERROR, new StaticFileHandler(FilePaths.ERROR));
 
