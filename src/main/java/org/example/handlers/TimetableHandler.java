@@ -41,6 +41,10 @@ public class TimetableHandler implements HttpHandler {
         // Identify user role for display
         String role = (currentUser instanceof Teacher) ? "Teacher" : "Student";
 
+        // Generate dynamic Back button URL and Text based on Polymorphism (User type)
+        String backUrl = (currentUser instanceof Teacher) ? Routes.TEACHER_DASHBOARD : Routes.ROOT;
+        String backText = (currentUser instanceof Teacher) ? "Back to Dashboard" : "Back to Home";
+
         // Generate table body with 5 days * 9 periods
         StringBuilder tableBody = new StringBuilder();
         // The getAvailability() method is defined in the User base class,
@@ -73,6 +77,10 @@ public class TimetableHandler implements HttpHandler {
         html = html.replace("{{USER_ROLE}}", role);
         html = html.replace("{{AVAILABILITY_STRING}}", availability);
         html = html.replace("{{TABLE_BODY}}", tableBody.toString());
+
+        // Replace the back link placeholders
+        html = html.replace("{{BACK_URL}}", backUrl);
+        html = html.replace("{{BACK_TEXT}}", backText);
 
         byte[] response = html.getBytes(StandardCharsets.UTF_8);
         exchange.sendResponseHeaders(200, response.length);

@@ -29,7 +29,8 @@
 
     <br>
     <button type="submit">Save Timetable</button>
-    <a href="/">Back to Home</a>
+
+    <a href="{{BACK_URL}}">{{BACK_TEXT}}</a>
 </form>
 
 <script>
@@ -40,14 +41,14 @@
      * @param index The 1D index (0-44) of the period.
      */
     function toggleCell(index) {
-        // 1. Get the HTML elements (cell and hidden input for availability data)
+        // Get the HTML elements (cell and hidden input for availability data)
         const cell = document.getElementById('cell-' + index);
         const hiddenInput = document.getElementById('availabilityData');
 
-        // 2. Convert the current string (e.g., "00100...") into an array of characters for easy modification
+        // Convert the current string (e.g., "00100...") into an array of characters for easy modification
         let availabilityArray = hiddenInput.value.split('');
 
-        // 3. Check the current status and toggle it (1 = available, 0 = busy)
+        // Check the current status and toggle it (1 = available, 0 = busy)
         if (availabilityArray[index] === '1') {
             // It was available, change to busy: reset background color and update array value
             availabilityArray[index] = '0';
@@ -58,7 +59,7 @@
             cell.style.backgroundColor = "lightgreen"; // Mark as available
         }
 
-        // 4. Join the array back into a string and update the hidden input (to submit with form)
+        // Join the array back into a string and update the hidden input (to submit with form)
         hiddenInput.value = availabilityArray.join('');
     }
 </script>

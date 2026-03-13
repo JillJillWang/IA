@@ -26,8 +26,8 @@ public class Routes {
     //Path of teacher registration submission
     public static final String SAVE_TEACHER = "/save-teacher";
 
-   // Path of the login page
-   // When the front end accesses this path, the login form is displayed
+    // Path of the login page
+    // When the front end accesses this path, the login form is displayed
     public static final String STUDENT_LOGIN = "/student-login";
     public static final String TEACHER_LOGIN = "/teacher-login";
 
@@ -46,9 +46,15 @@ public class Routes {
     // Path to view matching students (for the teacher)
     public static final String VIEW_MATCHES = "/view-matches";
 
+    // Path to process saving a meeting arrangement
+    public static final String SAVE_ARRANGEMENT = "/save-arrangement";
 
-   // Path of the error page
-   // When an error occurs during operation, jump to this page
+    // Path to process canceling a meeting arrangement
+    public static final String CANCEL_ARRANGEMENT = "/cancel-arrangement";
+
+
+    // Path of the error page
+    // When an error occurs during operation, jump to this page
     public static final String ERROR = "/error";
 
 

@@ -14,10 +14,6 @@ public class Student extends User {
     @DatabaseField(canBeNull = false)
     private int classNum;
 
-    // Student specific field for the 2-week reminder feature
-    @DatabaseField(defaultValue = "0")
-    private long lastMeetingTimestamp;
-
     // Non-arg constructor required by ORMLite
     public Student() {
         super();
@@ -32,12 +28,8 @@ public class Student extends User {
 
         // Assign specific fields
         this.classNum = classNum;
-        this.lastMeetingTimestamp = System.currentTimeMillis();
     }
 
     public int getClassNum() { return classNum; }
     public void setClassNum(int classNum) { this.classNum = classNum; }
-
-    public long getLastMeetingTimestamp() { return lastMeetingTimestamp; }
-    public void setLastMeetingTimestamp(long lastMeetingTimestamp) { this.lastMeetingTimestamp = lastMeetingTimestamp; }
 }

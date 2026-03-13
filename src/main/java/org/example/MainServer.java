@@ -49,6 +49,9 @@ public class MainServer {
                 TableUtils.createTableIfNotExists(connectionSource, Teacher.class);
                 Dao<Teacher, String> teacherDao = DaoManager.createDao(connectionSource, Teacher.class);
 
+                TableUtils.createTableIfNotExists(connectionSource, Arrangement.class);
+                Dao<Arrangement, Integer> arrangementDao = DaoManager.createDao(connectionSource, Arrangement.class);
+
 
                 // Initialize the HTTP server
                 // http://localhost:8080
@@ -77,7 +80,11 @@ public class MainServer {
                 // Show the teacher's dashboard
                 server.createContext(Routes.TEACHER_DASHBOARD, new TeacherDashboardHandler());
                 // Show the matching results (for the teacher)
-                server.createContext(Routes.VIEW_MATCHES, new ViewMatchesHandler(studentDao));
+                server.createContext(Routes.VIEW_MATCHES, new ViewMatchesHandler(studentDao, arrangementDao));
+                // Save the arrangement
+                server.createContext(Routes.SAVE_ARRANGEMENT, new SaveArrangementHandler(arrangementDao));
+                // Cancel the arrangement
+                server.createContext(Routes.CANCEL_ARRANGEMENT, new CancelArrangementHandler(arrangementDao));
 
 
 
