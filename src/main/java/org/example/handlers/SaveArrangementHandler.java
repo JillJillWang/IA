@@ -5,15 +5,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.example.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+
 
 /**
- * Handles saving the arrangement when a teacher clicks the "Arrange" button.
- * Uses standard HTML form submission and redirects back to the view-matches page.
+ * This class handles saving the arrangement when a teacher clicks the "Arrange" button.
+ * It uses HTML form submission. After the submission, it redirects to the view-matches page.
  */
 public class SaveArrangementHandler implements HttpHandler {
     private final Dao<Arrangement, Integer> arrangementDao;
@@ -25,52 +22,56 @@ public class SaveArrangementHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         // Only process POST request
-        if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) return;
+        if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+            return;
+        }
 
-        // Security check: Ensure the user is logged in AND is a Teacher
+        // Get the token and check who it is in the HashMap
         String token = HttpUtils.getSessionToken(exchange);
         User currentUser = SessionManager.getUser(token);
 
+        // Authentication & Authorization
         if (currentUser == null || !(currentUser instanceof Teacher)) {
             HttpUtils.showError(exchange, "Access Denied");
             return;
         }
 
         try {
-            // Read data from the HTML form submitted by the button
-            BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8));
-            String query = br.readLine();
+            // Get the HashMap
+            java.util.Map<String, String> formData = HttpUtils.parseFormData(exchange);
+            // Extract data from the HashMap
+            // Note: Since HttpUtils converts all keys to lowercase,
+            // here I must use "studentemail"
+            String studentEmail;
+            if (formData.containsKey("studentemail")) {
+                studentEmail = formData.get("studentemail");
+            } else {
+                studentEmail = "";
+            }
 
-            String studentEmail = "";
+            // Set a flag to determine whether the data extraction is successful
             int periodIndex = -1;
-
-            // Parse key-value pairs (format: studentEmail=...&periodIndex=...)
-            if (query != null) {
-                String[] vars = query.split("&");
-                for (String var : vars) {
-                    String[] keyvalue = var.split("=");
-                    if (keyvalue.length < 2) continue;
-                    String key = keyvalue[0];
-                    String value = URLDecoder.decode(keyvalue[1], StandardCharsets.UTF_8);
-
-                    if (key.equalsIgnoreCase("studentEmail")) {
-                        studentEmail = value;
-                    } else if (key.equalsIgnoreCase("periodIndex")) {
-                        periodIndex = Integer.parseInt(value);
-                    }
-                }
+            // Note: Since HttpUtils converts all keys to lowercase,
+            // here I must us "periodindex"
+            if (formData.containsKey("periodindex")) {
+                // Convert the extracted String numbers into int
+                periodIndex = Integer.parseInt(formData.get("periodindex"));
             }
 
             // Save the new arrangement to the database
+            // Make sure the email is not empty and the class schedule index is correct
             if (!studentEmail.isEmpty() && periodIndex != -1) {
+                // Create an Arrangement object
                 Arrangement arrangement = new Arrangement(currentUser.getEmail(), studentEmail, periodIndex);
+                // Call the create method of ORMLite to store the object in the database
                 arrangementDao.create(arrangement);
             }
 
-            // Redirect back to view-matches page, and add "?success=true" to the URL
+            // Redirect back to view-matches page by adding '?success=true' to the URL (query string)
             exchange.getResponseHeaders().add("Location", Routes.VIEW_MATCHES + "?success=true");
             exchange.sendResponseHeaders(302, -1);
 
+            // Show the error
         } catch (Exception e) {
             e.printStackTrace();
             HttpUtils.showError(exchange, "Failed to save arrangement.");

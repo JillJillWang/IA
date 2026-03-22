@@ -3,14 +3,14 @@ package org.example;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-/**
+/*
  * Student class extends the User base class.
  * It inherits common fields and adds student-specific attributes.
  */
 @DatabaseTable(tableName = "Student")
 public class Student extends User {
 
-    // Student specific field
+    // Student specific field: class number
     @DatabaseField(canBeNull = false)
     private int classNum;
 
@@ -30,6 +30,10 @@ public class Student extends User {
         this.classNum = classNum;
     }
 
-    public int getClassNum() { return classNum; }
-    public void setClassNum(int classNum) { this.classNum = classNum; }
+    public int getClassNum() {
+        return classNum;
+    }
+    public void setClassNum(int classNum) {
+        this.classNum = classNum;
+    }
 }

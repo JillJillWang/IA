@@ -10,15 +10,22 @@ import org.example.Teacher;
 import org.example.User;
 import org.example.HttpUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * Handles login requests for Student/Teacher roles with strict role-table separation.
  * Uses hidden 'role' form field to query only the relevant database table.
+ */
+
+/*
+ * Reference List:
+ * 1. Understanding Stateful vs Stateless HTTP and Sessions: MDN Web Docs
+ * (https://developer.mozilla.org/en-US/docs/Web/HTTP/Session)
+ * 2. Web Security - Securing Cookies with HttpOnly: OWASP Foundation
+ * (https://owasp.org/www-community/HttpOnly)
+ * 3. In-Memory Session Storage using Maps: Baeldung "Guide to Java HashMap"
+ * (https://www.baeldung.com/java-hashmap)
  */
 public class LoginHandler implements HttpHandler {
     // DAO for Student table (primary key: String - email)
@@ -44,56 +51,81 @@ public class LoginHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         // Only accept POST (secure for credential submission)
-        if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) return;
+        if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+            return;
+        }
 
         try {
-            // Read & decode form data from request body (UTF-8 to avoid encoding issues)
-            BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8));
-            String query = br.readLine();
+            // Retrieve the parsed form data as a HashMap
+            Map<String, String> formData = HttpUtils.parseFormData(exchange);
 
-            // Initialize variables for parsed form fields
-            String email = "";
-            String password = "";
-            String role = ""; // Track user role (student/teacher) from hidden form field
-
-            // Parse key-value pairs from form data (format: key=value&key=value)
-            String[] vars = query.split("&");
-            for (String var : vars) {
-                String[] keyvalue = var.split("=");
-                if (keyvalue.length < 2) continue; // Skip malformed key-value pairs
-                String key = keyvalue[0];
-                String value = URLDecoder.decode(keyvalue[1], StandardCharsets.UTF_8); // Decode URL-encoded values
-
-                // Normalize email to lowercase (avoid case sensitivity issues)
-                if (key.equalsIgnoreCase("email")) email = value.toLowerCase();
-                else if (key.equalsIgnoreCase("password")) password = value;
-                else if (key.equalsIgnoreCase("role")) role = value; // Extract role from hidden field
+            // Retrieve the data from the HashMap (if the user doesn't fill in,
+            // it defaults to an empty string "", to prevent the program from crashing)
+            // Note: Since I have converted all the keys to lowercase in HttpUtils,
+            // here I directly use the lowercase "email", "password", "role" to retrieve
+            String email;
+            if (formData.containsKey("email")) {
+                email = formData.get("email").toLowerCase();
+            } else {
+                email = "";
             }
 
+            String password;
+            if (formData.containsKey("password")) {
+                password = formData.get("password");
+            } else {
+                password = "";
+            }
+
+            // role: In the HTML code at the front end, there is a line:
+            // <input type="hidden" name="role" value="student"> (or teacher).
+            // This field is invisible on the webpage, but it will be sent to the backend along with the submission.
+            // The LoginHandler uses this "role" to decide whether to query the studentDao or the teacherDao.
+            String role;
+            if (formData.containsKey("role")) {
+                role = formData.get("role");
+            } else {
+                role = "";
+            }
+
+
+            // Declare a User object (can be a student or teacher)
             User loggedInUser = null;
 
-            // Strict role check: query ONLY the table matching the requested role
+            // Based on the role, retrieve the corresponding subclass objects from the database
+            // and place them into the box of the parent class.
             if (role.equalsIgnoreCase("student")) {
-                loggedInUser = studentDao.queryForId(email); // Query Student table by email (PK)
+                loggedInUser = studentDao.queryForId(email);
             } else if (role.equalsIgnoreCase("teacher")) {
-                loggedInUser = teacherDao.queryForId(email); // Query Teacher table by email (PK)
+                loggedInUser = teacherDao.queryForId(email);
             }
 
-            // Validate user existence and password match
+
+            /*
+             * The following code is used to solve the problems of
+             * user login verification and session state maintenance.
+             * This is because the HTTP protocol is stateless, which means it has no memory.
+             * Each time a user clicks on a new link, it is a completely new request for it.
+             * Therefore, by combining session token and cookie, the server can remember the logged-in users.
+             */
+            // If validate user existence and password match:
             if (loggedInUser != null && loggedInUser.hasPassword(password)) {
-                // Create session token & associate with user
+                // SessionManager will generate a string of random characters (a session token)
                 String token = SessionManager.createSession(loggedInUser);
 
-                // Set HttpOnly cookie (mitigate XSS attacks) - valid for entire application
+                // Issue a cookie with a token to the browser (equivalent to giving the browser an "identity bracelet")
+                // - Path=/: This cookie is valid throughout the entire website
+                // - HttpOnly: Add a protection lock to the cookie, so malicious code in the webpage cannot steal
+                // the token and prevent others from impersonating and logging in (defending against XSS attacks)
                 exchange.getResponseHeaders().add("Set-Cookie", "session=" + token + "; Path=/; HttpOnly");
 
-                // Role-based redirection (extra safety: check actual object type)
+                // Role-based redirection
                 if (loggedInUser instanceof Teacher) {
                     exchange.getResponseHeaders().add("Location", Routes.TEACHER_DASHBOARD);
                 } else {
                     exchange.getResponseHeaders().add("Location", Routes.TIMETABLE);
                 }
-                // Send 302 redirect (no response body needed)
+                // Send 302 redirect
                 exchange.sendResponseHeaders(302, -1);
             } else {
                 // Handle invalid credentials/role mismatch

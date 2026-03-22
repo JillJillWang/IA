@@ -3,14 +3,12 @@ package org.example;
 /**
  * This class is used to create unified replacement tags for the back-end code and HTML template conventions
  * to avoid hardcoding and ensure consistency of placeholders
- *
  * Definitions:
  * Hardcoding:
  * refers to a programming approach that directly embeds fixed values (such as strings,
  * numbers, paths, etc.) into the source code, rather than managing them uniformly through constants,
  * databases, and other means.
  * It is prone to errors and with poor scalability
- *
  * Placeholder:
  * Occupy a position with a string of a specific format,
  * and then replace it with actual dynamic data/message later.

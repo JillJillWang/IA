@@ -3,13 +3,12 @@ package org.example.handlers;
 import com.j256.ormlite.dao.Dao;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.example.HttpUtils;
 import org.example.Routes;
 import org.example.Student;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static org.example.HttpUtils.showError;
 
@@ -19,8 +18,7 @@ import static org.example.HttpUtils.showError;
  * and handling redirect/error responses
  */
 public class SaveStudentHandler implements HttpHandler{
-    private final Dao<Student, String> studentDao; // add DAO (Data Access Object)
-
+    private final Dao<Student, String> studentDao; // add DAO
 
     /**
      * The constructor that receives Student DAO
@@ -37,30 +35,66 @@ public class SaveStudentHandler implements HttpHandler{
      */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        // Security check: Only process POST requests
+        // POST is an HTTP method used to submit data to a server to create or update resources
+        // Unlike GET (data exposed in URL), POST sends data in the request body
+        // This makes POST far more secure for transmitting sensitive data
+        if (!exchange.getRequestMethod().equalsIgnoreCase("POST")) {
+            return;
+        }
+
         try {
-            // Convert data from HTML form into a Student object
-            Student student = getStudent(exchange);
+            // Retrieve the parsed form data as a HashMap
+            Map<String, String> formData = HttpUtils.parseFormData(exchange);
+            // Create a new Student object
+            Student newStudent = new Student();
 
-            /*
-            Check whether the email address has been registered
-            Send error response and show error message if the email has been registered
-
-            queryForId:
-            A query method provided by ORMLite. By giving it a unique identifier (e.g., an email address),
-            it will search for the corresponding piece of data in the database.
-            If it finds it, it will return that data; if not, it will return null.
-             */
-            Student existingEmail = studentDao.queryForId(student.getEmail());
-            if (existingEmail != null) {
-                showError(exchange, "This email address already exists");
+            // Extract the values of the Student object
+            if (formData.containsKey("email")) {
+                newStudent.setEmail(formData.get("email").toLowerCase());
+            }
+            if (formData.containsKey("name")) {
+                newStudent.setName(formData.get("name"));
+            }
+            if (formData.containsKey("password")) {
+                newStudent.setPassword(formData.get("password"));
+            }
+            // Extract and convert String to Integer
+            if (formData.containsKey("classnum")) {
+                newStudent.setClassNum(Integer.parseInt(formData.get("classnum")));
             }
 
-            // Save the Student object to the database using ORMLite DAO
-            this.studentDao.create(student);
+            // A basic validation to ensure all fields are present
+            // Make sure that no crucial information is omitted;
+            // otherwise, the creation will be rejected.
+            if ((newStudent.getEmail() == null) || (newStudent.getName() == null)
+                    || (newStudent.getPassword() == null) || (Integer.valueOf(newStudent.getClassNum()) == null)) {
+                throw new IOException("All fields (email, name, password, classNum) are required");
+            }
+
+            /*
+             * Check whether the email address has been registered
+             * Send error response and show error message if the email has been registered
+             *
+             * queryForId:
+             * A query method provided by ORMLite. By giving it a unique identifier (e.g., an email address),
+             * it will search for the corresponding piece of data in the database.
+             * If it finds it, it will return that data; if not, it will return null.
+             */
+            Student existingEmail = studentDao.queryForId(newStudent.getEmail());
+
+            // If there is an existing same email in database, jump to the error page
+            if (existingEmail != null) {
+                showError(exchange, "This email address already exists");
+                return;
+            }
+            // If there's no same email, the Student object will be saved in database
+            this.studentDao.create(newStudent);
+
             // Redirect to Student Login page after successful registration
             exchange.getResponseHeaders().add("Location", Routes.STUDENT_LOGIN);
-            exchange.sendResponseHeaders(302, -1); // 302: redirect code, -1: no response body
-
+            // 302: redirect code, -1: no response body
+            exchange.sendResponseHeaders(302, -1);
 
 
         } catch (Exception e) {
@@ -70,53 +104,4 @@ public class SaveStudentHandler implements HttpHandler{
             showError(exchange, e.getMessage());
         }
     }
-
-
-    /**
-     * This method parses data from HTTP into a Student object and decodes URL entities.
-     * I used URLDecoder to ensure special characters like '@' are stored correctly.
-     * @param exchange HttpExchange object, the carrier of HTTP requests and responses
-     * @return Return validated Student object
-     * @throws IOException The exception to inputs and outputs
-     */
-    private static Student getStudent(HttpExchange exchange) throws IOException {
-        // Read the data from the request body
-        BufferedReader br = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8));
-        Student newStudent = new Student();
-        String query = br.readLine();
-
-        if (query == null || query.isEmpty()) {
-            throw new IOException("Request body is empty");
-        }
-
-        // Split the query string by "&"
-        String[] vars = query.split("&");
-        for (String var : vars) {
-            String[] keyvalue = var.split("=");
-            if (keyvalue.length < 2) continue;
-
-            // Decode the value to handle special characters like @ in emails
-            String key = keyvalue[0];
-            String value = java.net.URLDecoder.decode(keyvalue[1], StandardCharsets.UTF_8);
-
-            if (key.equalsIgnoreCase("email")) {
-                newStudent.setEmail(value);
-            } else if (key.equalsIgnoreCase("name")) {
-                newStudent.setName(value);
-            } else if (key.equalsIgnoreCase("password")) {
-                newStudent.setPassword(value);
-            } else if (key.equalsIgnoreCase("classnum")) {
-                newStudent.setClassNum(Integer.parseInt(value));
-            }
-        }
-
-        // Basic validation to ensure all fields are present
-        if (newStudent.getEmail() == null || newStudent.getName() == null
-                || newStudent.getPassword() == null) {
-            throw new IOException("All fields (email, name, password, classNum) are required");
-        }
-        return newStudent;
-    }
-
-
 }

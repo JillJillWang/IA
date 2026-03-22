@@ -35,31 +35,61 @@
 
 <script>
     /**
-     * This function is called when a user clicks a cell.
-     * It toggles the visual color of the cell and updates the hidden 45-character string.
-     * No AJAX is used here; data is only sent when the form is submitted.
-     * @param index The 1D index (0-44) of the period.
+     * This is a trigger function. It will be called when the user clicks on any <td> cell in the table.
+     * @param index This parameter is a 1D index (0 to 44) passed from the backend TimetableHandler.
+     * It represents which of the 45 cells the user has clicked on.
+     * I studied it from the following resources:
+     * 1. JavaScript HTML DOM Elements : W3Schools
+     * (https://www.w3schools.com/js/js_htmldom_elements.asp)
+     * 2. JavaScript String to Array conversions (.split and .join): MDN Web Docs
+     * (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split)
+     * 3. HTML Hidden Input Fields: HTML.com
+     * (https://html.com/input-type-hidden/)
      */
     function toggleCell(index) {
-        // Get the HTML elements (cell and hidden input for availability data)
+
+        // Step 1: Grab HTML elements
+        // Find the specific table cell <td> that the user just clicked
         const cell = document.getElementById('cell-' + index);
+
+        // Find the hidden input field that stores the current 45-character string
+        // Hidden input allows developers to include data in forms that is not
+        // visible to users, enabling the submission of information without user interaction
         const hiddenInput = document.getElementById('availabilityData');
 
-        // Convert the current string (e.g., "00100...") into an array of characters for easy modification
+        // Step 2: Data structure conversion
+        // Like Java, strings in JavaScript are also immutable.
+        // For example, I cannot directly modify the 11th character using hiddenInput.value[11] = '1'.
+        // Therefore, I use .split('') to split a string like "00100" into an array ['0', '0', '1', '0', '0']
+        // Then, arrays allow modification of them!
         let availabilityArray = hiddenInput.value.split('');
 
-        // Check the current status and toggle it (1 = available, 0 = busy)
+        // Step 3: State judgment and toggling
+        // Check the array to see if the cell clicked by the user is currently '1' (available) or '0' (unavailable).
         if (availabilityArray[index] === '1') {
-            // It was available, change to busy: reset background color and update array value
+            // Scenario A: Originally '1' (green). This means the user wants to cancel the availability.
+
+            // Modify data: Change this position in the array to '0'
             availabilityArray[index] = '0';
-            cell.style.backgroundColor = ""; // Reset to default
+
+            // Modify UI: Clear the background color of the cell (revert to normal white)
+            cell.style.backgroundColor = "";
+
         } else {
-            // It was busy, change to available: set lightgreen background and update array value
+            // Scenario B: Originally '0' (white). This means the user wants to mark this class period as available.
+
+            // Modify data: Change this position in the array to '1'
             availabilityArray[index] = '1';
-            cell.style.backgroundColor = "lightgreen"; // Mark as available
+
+            // Modify UI: Use CSS to set the cell's background color to lightgreen
+            cell.style.backgroundColor = "lightgreen";
         }
 
-        // Join the array back into a string and update the hidden input (to submit with form)
+        // Step 4: Save the data
+        // Now the array has been modified (E.g., becomes ['0', '1', '1', '0', '0']).
+        // I use .join('') to rejoin this array into a string "01100".
+        // Then I put this new string back into the hidden input field
+        // In this way, when the user clicks the Save button, the latest 45-character string will be submitted to the backend
         hiddenInput.value = availabilityArray.join('');
     }
 </script>

@@ -9,6 +9,12 @@ import java.util.UUID;
  * doesn't provide a built-in session mechanism like Tomcat or Spark.
  * It maps a unique Token (stored in browser cookie) to a Student object.
  */
+
+/*
+ * Reference List:
+ * Generating Secure Tokens: Oracle Java Documentation for UUID
+ * (https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html)
+ */
 public class SessionManager {
     // A thread-safe-like approach to store active sessions
     // Key: Session ID (UUID), Value: The logged-in Student object
@@ -21,8 +27,14 @@ public class SessionManager {
      * @return A unique session token string
      */
     public static String createSession(User user) {
+        // Generate a string of random characters that do not repeat
+        // UUID: A class representing an immutable universally unique identifier
+        // A UUID represents a 128-bit value
         String token = UUID.randomUUID().toString();
+        // Write the correspondence between the token and the user
         sessions.put(token, user);
+        // Return the token back to the LoginHandler
+        // (so that it can be stuffed into the Cookie)
         return token;
     }
 
@@ -32,7 +44,12 @@ public class SessionManager {
      * @return User object if found, otherwise null
      */
     public static User getUser(String token) {
-        if (token == null) return null;
+        // If the browser doesn't have any cookies, reject it
+        if (token == null) {
+            return null;
+        }
+        // Otherwise, look through the HashMap sessions to find out which person
+        // this token corresponds to. If not found, return null.
         return sessions.get(token);
     }
 
@@ -41,6 +58,7 @@ public class SessionManager {
      * @param token The token to invalidate
      */
     public static void logout(String token) {
+        // Remove the token after the user log out
         sessions.remove(token);
     }
 }
